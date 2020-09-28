@@ -1,7 +1,8 @@
 import React from "react";
 import { Menu } from "semantic-ui-react";
 
-import UserPanel from '../user-panel/user-panel.component'
+import UserPanel from "../user-panel/user-panel.component";
+import Channels from "../channels/channels.component";
 
 const SidePanel = () => {
 	return (
@@ -12,8 +13,9 @@ const SidePanel = () => {
 			vertical
 			style={{ background: "#4c3c4c", fontSize: "1.2rem" }}
 		>
-            <UserPanel />
-        </Menu>
+			<UserPanel />
+			<Channels />
+		</Menu>
 	);
 };
 
