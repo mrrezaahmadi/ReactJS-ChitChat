@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Switch, Route, useHistory } from 'react-router-dom'
+import firebase from './firebase/firebase.config'
 import 'semantic-ui-css/semantic.min.css'
 
 import App from './App';
@@ -11,19 +12,30 @@ import Login from './components/auth/login.component'
 import Register from './components/auth/register.component'
 
 
-const Root = () => (
-  <Router>
+const Root = () => {
+
+  const history = useHistory()
+  useEffect(() => {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        history.push('/')
+      }
+    })
+  }, [])
+  return (
     <Switch>
       <Route exact path='/' component={App} />
       <Route path="/login" component={Login} />
       <Route path='/register' component={Register} />
     </Switch>
-  </Router>
-)
+  )
+}
 
 ReactDOM.render(
   <React.StrictMode>
-    <Root />
+    <Router>
+      <Root />
+    </Router>
   </React.StrictMode>,
   document.getElementById('root')
 );
