@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import firebase from "../../firebase/firebase.config";
 
 // Styles
 import { Menu, Icon, Modal, Form, Input, Button } from "semantic-ui-react";
 import { connect } from "react-redux";
 
-const Channels = ({ currentUser }) => {
+import { setCurrentChannel } from "../../redux/channel/channel.action";
+
+const Channels = ({ currentUser, setCurrentChannel }) => {
 	const [channelsBar, setChannelsBar] = useState({
 		channels: [],
 		channelName: "",
@@ -16,12 +18,28 @@ const Channels = ({ currentUser }) => {
 
 	const { channels, channelName, channelDetails } = channelsBar;
 
+	useEffect(() => {
+		addListeners();
+	}, []);
+
 	const closeModal = () => {
 		setModal(false);
 	};
 
 	const openModal = () => {
 		setModal(true);
+	};
+
+	const addListeners = () => {
+		let loadedChannels = [];
+		channelsRef.on("child_added", (snap) => {
+			loadedChannels.push(snap.val());
+			console.log(loadedChannels);
+			setChannelsBar({
+				...channelsBar,
+				channels: [...channels, ...loadedChannels],
+			});
+		});
 	};
 
 	const addChannel = () => {
@@ -75,6 +93,16 @@ const Channels = ({ currentUser }) => {
 					</span>{" "}
 					({channels.length}) <Icon name="add" onClick={openModal} />
 				</Menu.Item>
+				{channels.length > 0 &&
+					channels.map((channel) => (
+						<Menu.Item
+							key={channel.id}
+							onClick={() => setCurrentChannel(channel)}
+							style={{ opacity: 0.7 }}
+						>
+							# {channel.name}
+						</Menu.Item>
+					))}
 			</Menu.Menu>
 			<Modal basic open={modal} onClose={closeModal}>
 				<Modal.Header>Add a Channel</Modal.Header>
@@ -83,16 +111,16 @@ const Channels = ({ currentUser }) => {
 						<Form.Field>
 							<Input
 								fluid
-								label="About the Channel"
-								name="channelName"
+								label="Name of Channel"
+								name="channelDetails"
 								onChange={handleChange}
 							/>
 						</Form.Field>
 						<Form.Field>
 							<Input
 								fluid
-								label="Name of Channel"
-								name="channelDetails"
+								label="About the Channel"
+								name="channelName"
 								onChange={handleChange}
 							/>
 						</Form.Field>
@@ -115,4 +143,4 @@ const mapStateToProps = (state) => ({
 	currentUser: state.user.currentUser,
 });
 
-export default connect(mapStateToProps)(Channels);
+export default connect(mapStateToProps, { setCurrentChannel })(Channels);
