@@ -11,22 +11,54 @@ const Register = () => {
         password: '',
         passwordConfirmation: ''
     })
+
+    const [errors, setErrors] = useState('')
     const { username, email, password, passwordConfirmation } = formInput
 
     const handleChange = (e) => {
-        setFormInput({...formInput, [e.target.name]: e.target.value })
+        setFormInput({ ...formInput, [e.target.name]: e.target.value })
     }
 
+    const isFormValid = () => {
+        if (isFormEmpty(formInput)) {
+            setErrors('Fill in all the fields')
+            return false;
+        } else if (!isPasswordValid(formInput)) {
+            setErrors('Password is not valid! ')
+            return false
+        } else {
+            // form valid
+            return true;
+        }
+    }
+
+    const isFormEmpty = ({ username, email, password, passwordConfirmation }) => {
+        return !username.length || !email.length || !password.length || !passwordConfirmation.length
+    }
+
+    const isPasswordValid = ({ password, passwordConfirmation }) => {
+        if (password.length < 6 || passwordConfirmation.length < 6) {
+            return false
+        } else if (password !== passwordConfirmation) {
+            return false
+        } else {
+            return true
+        }
+    }
+
+
     const handleSubmit = (e) => {
-        e.preventDefault()
-        firebase
-            .auth()
-            .createUserWithEmailAndPassword(email, password)
-            .then(createdUser => {
-                console.log(createdUser)
-            }).catch(error => {
-                console.error(error)
-            })
+        if (isFormValid()) {
+            e.preventDefault()
+            firebase
+                .auth()
+                .createUserWithEmailAndPassword(email, password)
+                .then(createdUser => {
+                    console.log(createdUser)
+                }).catch(error => {
+                    console.error(error)
+                })
+        }
     }
 
     return (
@@ -45,6 +77,12 @@ const Register = () => {
                         <Button color="red" fluid size="large">Submit</Button>
                     </Segment>
                 </Form>
+                {errors.length > 0 && (
+                    <Message error>
+                        <h3>Error</h3>
+                        <p>{errors}</p>
+                    </Message>
+                )}
                 <Message>Already a user? <Link to="/login">Login</Link></Message>
             </Grid.Column>
         </Grid>
