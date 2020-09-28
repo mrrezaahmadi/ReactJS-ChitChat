@@ -13,6 +13,7 @@ const Register = () => {
         passwordConfirmation: ''
     })
 
+    const [userRef, setUserRef] = useState(firebase.database().ref('users'))
     const [errors, setErrors] = useState('')
     const [loading, setLoading] = useState(false)
     const { username, email, password, passwordConfirmation } = formInput
@@ -64,7 +65,9 @@ const Register = () => {
                         displayName: username,
                         photoURL: `http://gravatar.com/avatar/${md5(createdUser.user.email)}?d=identicon`
                     }).then(() => {
-                        setLoading(false)
+                        saveUser(createdUser).then(() => {
+                            console.log('user saved')
+                        })
                     }).catch(error => {
                         console.log(error)
                         setErrors(`${error}`)
@@ -76,6 +79,13 @@ const Register = () => {
                     setErrors(`${error}`)
                 })
         }
+    }
+
+    const saveUser = (createdUser) => {
+        return userRef.child(createdUser.user.uid).set({
+            name: createdUser.user.displayName,
+            avatar: createdUser.user.photoURL
+        })
     }
 
     return (

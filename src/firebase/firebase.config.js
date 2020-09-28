@@ -6,14 +6,14 @@ import 'firebase/storage'
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 var firebaseConfig = {
-    apiKey: "AIzaSyCPNuozb6nZvna9y7OAq43lQEX3fY9OlNQ",
-    authDomain: "react-slack-clone-61212.firebaseapp.com",
-    databaseURL: "https://react-slack-clone-61212.firebaseio.com",
-    projectId: "react-slack-clone-61212",
-    storageBucket: "react-slack-clone-61212.appspot.com",
-    messagingSenderId: "54199345513",
-    appId: "1:54199345513:web:6c2e4f076d811c57cd1df8",
-    measurementId: "G-1QRLRQT0J4"
+    aapiKey: "AIzaSyB7CTiBHh3Crp1X-SaVDr9aVe_eFFoiMiM",
+    authDomain: "slack-clone-5a3c7.firebaseapp.com",
+    databaseURL: "https://slack-clone-5a3c7.firebaseio.com",
+    projectId: "slack-clone-5a3c7",
+    storageBucket: "slack-clone-5a3c7.appspot.com",
+    messagingSenderId: "723050505366",
+    appId: "1:723050505366:web:5b6e3097fccc1deff60eb7",
+    measurementId: "G-ZCT34C84CR"
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
