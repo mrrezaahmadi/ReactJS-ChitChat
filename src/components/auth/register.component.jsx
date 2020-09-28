@@ -13,6 +13,7 @@ const Register = () => {
     })
 
     const [errors, setErrors] = useState('')
+    const [loading, setLoading] = useState(false)
     const { username, email, password, passwordConfirmation } = formInput
 
     const handleChange = (e) => {
@@ -48,15 +49,21 @@ const Register = () => {
 
 
     const handleSubmit = (e) => {
+        e.preventDefault()
         if (isFormValid()) {
-            e.preventDefault()
+            setErrors('')
+            setLoading(true)
+
             firebase
                 .auth()
                 .createUserWithEmailAndPassword(email, password)
                 .then(createdUser => {
                     console.log(createdUser)
+                    setLoading(false)
                 }).catch(error => {
                     console.error(error)
+                    setLoading(false)
+                    setErrors(`${error}`)
                 })
         }
     }
@@ -74,7 +81,7 @@ const Register = () => {
                         <Form.Input fluid value={email} name="email" icon="mail" iconPosition="left" placeholder="Email Address" onChange={handleChange} type="email" />
                         <Form.Input fluid value={password} name="password" icon="lock" iconPosition="left" placeholder="Password" onChange={handleChange} type="password" />
                         <Form.Input fluid value={passwordConfirmation} name="passwordConfirmation" icon="repeat" iconPosition="left" placeholder="Password Confirmation" onChange={handleChange} type="password" />
-                        <Button color="red" fluid size="large">Submit</Button>
+                        <Button disabled={loading} className={loading ? 'loading' : ''} color="red" fluid size="large">Submit</Button>
                     </Segment>
                 </Form>
                 {errors.length > 0 && (
