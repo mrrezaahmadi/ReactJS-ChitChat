@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import firebase from '../../firebase/firebase.config'
+import md5 from 'md5'
 import { Grid, Form, Segment, Button, Header, Message, Icon } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 
@@ -59,7 +60,16 @@ const Register = () => {
                 .createUserWithEmailAndPassword(email, password)
                 .then(createdUser => {
                     console.log(createdUser)
-                    setLoading(false)
+                    createdUser.user.updateProfile({
+                        displayName: username,
+                        photoURL: `http://gravatar.com/avatar/${md5(createdUser.user.email)}?d=identicon`
+                    }).then(() => {
+                        setLoading(false)
+                    }).catch(error => {
+                        console.log(error)
+                        setErrors(`${error}`)
+                        setLoading(false)
+                    })
                 }).catch(error => {
                     console.error(error)
                     setLoading(false)
