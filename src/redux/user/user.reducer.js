@@ -13,6 +13,11 @@ const userReducer = (state = INITIAL_STATE, action) => {
                 currentUser: action.payload.currentUser,
                 isLoading: false
             }
+        case actionTypes.CLEAR_USER:
+            return {
+                ...state,
+                isLoading: false
+            }
         default:
             return state
     }

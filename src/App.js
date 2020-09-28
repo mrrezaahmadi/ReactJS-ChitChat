@@ -15,9 +15,9 @@ import Register from './pages/register-page/register-page.component'
 import Spinner from './components/spinner/spinner.component'
 
 // Actions
-import { setUser } from './redux/user/user.action'
+import { setUser, clearUser } from './redux/user/user.action'
 
-function App({ setUser, isLoading }) {
+function App({ setUser, isLoading, clearUser }) {
   const history = useHistory()
   useEffect(() => {
     firebase.auth().onAuthStateChanged(user => {
@@ -25,10 +25,13 @@ function App({ setUser, isLoading }) {
         // console.log(user)
         setUser(user)
         history.push('/')
+      } else {
+        history.push('/login')
+        clearUser()
       }
     })
   }, [])
-  
+
   return isLoading ? <Spinner /> : (
     <Switch>
       <Route exact path='/' component={Home} />
@@ -43,4 +46,4 @@ const mapStateToProps = state => ({
   isLoading: state.user.isLoading
 })
 
-export default connect(mapStateToProps, { setUser })(App);
+export default connect(mapStateToProps, { setUser, clearUser })(App);
