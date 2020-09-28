@@ -12,15 +12,33 @@ const Channels = ({ currentUser, setCurrentChannel }) => {
 		channels: [],
 		channelName: "",
 		channelDetails: "",
+		firstLoad: true,
+		activeChannel: "",
 	});
 	const [modal, setModal] = useState(false);
 	const channelsRef = firebase.database().ref("channels");
 
-	const { channels, channelName, channelDetails } = channelsBar;
+	const {
+		activeChannel,
+		firstLoad,
+		channels,
+		channelName,
+		channelDetails,
+	} = channelsBar;
 
 	useEffect(() => {
 		addListeners();
-	}, []);
+    }, []);
+    
+    useEffect(() => {
+        return () => {
+            removeListeners()
+        }
+    }, [])
+
+    const removeListeners = () => {
+        channelsRef.off()
+    }
 
 	const closeModal = () => {
 		setModal(false);
@@ -41,6 +59,14 @@ const Channels = ({ currentUser, setCurrentChannel }) => {
 			});
 		});
 	};
+
+	useEffect(() => {
+		if (firstLoad && channels.length > 0) {
+			setCurrentChannel(channels[0]);
+			handleActiveChannel(channels[0]);
+		}
+		setChannelsBar({ ...channelsBar, firstLoad: false });
+	}, [channels]);
 
 	const addChannel = () => {
 		const key = channelsRef.push().key;
@@ -84,6 +110,15 @@ const Channels = ({ currentUser, setCurrentChannel }) => {
 		setChannelsBar({ ...channelsBar, [name]: value });
 	};
 
+	const changeChannel = (channel) => {
+		handleActiveChannel(channel);
+		setCurrentChannel(channel);
+	};
+
+	const handleActiveChannel = (channel) => {
+		setChannelsBar({ ...channelsBar, activeChannel: channel.id });
+	};
+
 	return (
 		<React.Fragment>
 			<Menu.Menu style={{ paddingBottom: "2rm" }}>
@@ -97,8 +132,9 @@ const Channels = ({ currentUser, setCurrentChannel }) => {
 					channels.map((channel) => (
 						<Menu.Item
 							key={channel.id}
-							onClick={() => setCurrentChannel(channel)}
+							onClick={() => changeChannel(channel)}
 							style={{ opacity: 0.7 }}
+							active={channel.id === activeChannel}
 						>
 							# {channel.name}
 						</Menu.Item>
