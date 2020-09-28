@@ -82,8 +82,8 @@ const Register = () => {
 						.then(() => {
 							saveUser(createdUser).then(() => {
 								console.log("user saved");
-                            });
-                            setLoading(false)
+							});
+							setLoading(false);
 						})
 						.catch((error) => {
 							console.error(error);
