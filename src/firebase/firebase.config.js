@@ -6,7 +6,7 @@ import 'firebase/storage'
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 var firebaseConfig = {
-    aapiKey: "AIzaSyB7CTiBHh3Crp1X-SaVDr9aVe_eFFoiMiM",
+    apiKey: "AIzaSyB7CTiBHh3Crp1X-SaVDr9aVe_eFFoiMiM",
     authDomain: "slack-clone-5a3c7.firebaseapp.com",
     databaseURL: "https://slack-clone-5a3c7.firebaseio.com",
     projectId: "slack-clone-5a3c7",
