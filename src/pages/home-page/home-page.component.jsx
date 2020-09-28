@@ -2,7 +2,7 @@ import React from "react";
 
 // Styles
 import { Grid } from "semantic-ui-react";
-import "./home-page.styles.scss";
+import '../../App.css'
 
 // Components
 import ColorPanel from "../../components/color-panel/color-panel.component";
@@ -11,7 +11,7 @@ import MetaPanel from "../../components/meta-panel/meta-panel.component";
 import Messages from "../../components/messages/messages.component";
 
 const Home = () => (
-	<Grid columns="equal" className="Home" style={{ background: "#eee" }}>
+	<Grid columns="equal" className="app" style={{ background: "#eee" }}>
 		<ColorPanel />
 		<SidePanel />
 

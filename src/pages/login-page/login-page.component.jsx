@@ -10,6 +10,7 @@ import {
 	Icon,
 } from "semantic-ui-react";
 import { Link } from "react-router-dom";
+import '../../App.css'
 
 const Login = () => {
 	// states
@@ -35,7 +36,7 @@ const Login = () => {
 				.auth()
 				.signInWithEmailAndPassword(email, password)
 				.then((singedInUser) => {
-					console.log(singedInUser);
+					// console.log(singedInUser);
 				})
 				.catch((error) => {
 					console.log(error);

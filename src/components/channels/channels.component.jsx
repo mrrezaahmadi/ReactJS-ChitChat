@@ -52,7 +52,7 @@ const Channels = ({ currentUser, setCurrentChannel }) => {
 		let loadedChannels = [];
 		channelsRef.on("child_added", (snap) => {
 			loadedChannels.push(snap.val());
-			console.log(loadedChannels);
+			// console.log(loadedChannels);
 			setChannelsBar({
 				...channelsBar,
 				channels: [...channels, ...loadedChannels],
