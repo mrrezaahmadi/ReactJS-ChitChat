@@ -11,6 +11,7 @@ import firebase from "../../firebase/firebase.config";
 import "./messages-form.styles.scss";
 
 import FileModal from "../file-modal/file-modal.component";
+import ProgressBar from '../progress-bar/progress-bar.component'
 
 const MessagesFrom = ({ currentUser, currentChannel, messagesRef }) => {
 	const storageRef = firebase.storage().ref();
@@ -195,6 +196,7 @@ const MessagesFrom = ({ currentUser, currentChannel, messagesRef }) => {
 					closeModal={closeModal}
 				/>
 			</Button.Group>
+			<ProgressBar uploadState={uploadState} percentUploaded={percentUploaded} />
 		</Segment>
 	);
 };
