@@ -50,17 +50,10 @@ const Channels = ({ currentUser, setCurrentChannel }) => {
 		channelsRef.on("child_added", (snap) => {
 			loadedChannels.push(snap.val());
 			// console.log(loadedChannels);
-			setState({ ...state, channels: [...channels, ...loadedChannels] })
+			setState({ ...state, channels: [...channels, ...loadedChannels] }, () => setFirstChannel())
 		});
 	};
 
-	// useEffect(() => {
-	// 	if (firstLoad && channels.length > 0) {
-	// 		setCurrentChannel(channels[0]);
-	// 		setActiveChannel(channels[0]);
-	// 	}
-	// 	setState({...state, firstLoad: false})
-	// }, [channels]);
 
 	const setFirstChannel = () => {
 		if (firstLoad && channels.length > 0) {
