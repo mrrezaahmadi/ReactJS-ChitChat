@@ -8,9 +8,9 @@ import { Menu, Icon, Modal, Form, Input, Button } from "semantic-ui-react";
 import { connect } from "react-redux";
 import './channels.styles.scss'
 
-import { setCurrentChannel } from "../../redux/channel/channel.action";
+import { setCurrentChannel, setPrivateChannel } from "../../redux/channel/channel.action";
 
-const Channels = ({ currentUser, setCurrentChannel }) => {
+const Channels = ({ currentUser, setCurrentChannel, setPrivateChannel }) => {
 
 	const [state, setState] = useStateWithCallbackLazy({
 		user: currentUser,
@@ -80,7 +80,7 @@ const Channels = ({ currentUser, setCurrentChannel }) => {
 			.child(key)
 			.update(newChannel)
 			.then(() => {
-				setState({...state, channelDetails: "", channelName: ""})
+				setState({ ...state, channelDetails: "", channelName: "" })
 				closeModal();
 				console.log("channel added");
 			})
@@ -102,16 +102,17 @@ const Channels = ({ currentUser, setCurrentChannel }) => {
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
-		setState({...state, [name]: value})
+		setState({ ...state, [name]: value })
 	};
 
 	const changeChannel = (chnl) => {
 		setActiveChannel(chnl);
 		setCurrentChannel(chnl);
+		setPrivateChannel(false)
 	};
 
 	const setActiveChannel = (channel) => {
-		setState({...state, activeChannel: channel.id})
+		setState({ ...state, activeChannel: channel.id })
 	};
 
 	return (
@@ -174,4 +175,4 @@ const mapStateToProps = (state) => ({
 	currentUser: state.user.currentUser,
 });
 
-export default connect(mapStateToProps, { setCurrentChannel })(Channels);
+export default connect(mapStateToProps, { setPrivateChannel, setCurrentChannel })(Channels);

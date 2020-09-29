@@ -13,7 +13,7 @@ import "./messages-form.styles.scss";
 import FileModal from "../file-modal/file-modal.component";
 import ProgressBar from '../progress-bar/progress-bar.component'
 
-const MessagesFrom = ({ currentUser, currentChannel, messagesRef, isProgressBarVisible }) => {
+const MessagesFrom = ({ getMessagesRef,  isPrivateChannel, currentUser, currentChannel, messagesRef, isProgressBarVisible }) => {
 	const storageRef = firebase.storage().ref();
 
 	const [state, setState] = useStateWithCallbackLazy({
@@ -74,7 +74,7 @@ const MessagesFrom = ({ currentUser, currentChannel, messagesRef, isProgressBarV
 	const sendMessage = () => {
 		if (message) {
 			setState({ ...state, loading: true });
-			messagesRef
+			getMessagesRef()
 				.child(currentChannel.id)
 				.push()
 				.set(createMessage())
@@ -90,11 +90,19 @@ const MessagesFrom = ({ currentUser, currentChannel, messagesRef, isProgressBarV
 		}
 	};
 
+	const getPath = () => {
+		if (isPrivateChannel) {
+			return `chat/private-${channel.id}`
+		} else {
+			return `chat/public`
+		}
+	}
+
 	const uploadFile = (file, metaData) => {
 		// console.log(file, metaData)
 		const pathToUpload = currentChannel.id;
-		const ref = messagesRef;
-		const filePath = `chat/public/${uuidv4}.jpg`;
+		const ref = getMessagesRef();
+		const filePath = `${getPath()}/${uuidv4}.jpg`;
 
 		setState(
 			{

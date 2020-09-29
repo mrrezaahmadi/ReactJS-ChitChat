@@ -11,9 +11,10 @@ import Message from "../message/message.component";
 
 import "./messages.styles.scss";
 
-const Messages = ({ currentChannel, currentUser }) => {
+const Messages = ({ currentChannel, currentUser, isPrivateChannel }) => {
 
 	const [state, setState] = useStateWithCallbackLazy({
+		privateMessagesRef: firebase.database().ref('privateMessages'),
 		messages: [],
 		messagesLoading: true,
 		channel: currentChannel,
@@ -23,10 +24,11 @@ const Messages = ({ currentChannel, currentUser }) => {
 		numUniqueUsers: '',
 		searchTerm: "",
 		searchLoading: false,
-		searchResult: []
+		searchResult: [],
+		privateChannel: isPrivateChannel
 	})
 
-	const { messages, messagesLoading, messagesRef, channel, user, progressBar, numUniqueUsers, searchTerm, searchLoading, searchResult } = state
+	const { privateChannel, messages, messagesRef, channel, user, progressBar, numUniqueUsers, searchTerm, searchLoading, searchResult } = state
 
 	useEffect(() => {
 		if (channel && user) {
@@ -40,13 +42,19 @@ const Messages = ({ currentChannel, currentUser }) => {
 
 	const addMessageListener = (channelId) => {
 		let loadedMessages = [];
-		messagesRef.child(channelId).on("child_added", (snap) => {
+		const ref = getMessagesRef()
+		ref.child(channelId).on("child_added", (snap) => {
 			loadedMessages.push(snap.val());
 			// console.log("loaded messages", loadedMessages);
 			setState({ ...state, messages: [...messages, ...loadedMessages], messagesLoading: false })
 		});
 		countUniqueUsers(loadedMessages)
 	};
+
+	const getMessagesRef = () => {
+		const { messagesRef, privateMessagesRef, privateChannel } = state
+		return privateChannel ? privateMessagesRef : messagesRef
+	} 
 
 	const isProgressBarVisible = percent => {
 		if (percent > 0) {
@@ -89,7 +97,9 @@ const Messages = ({ currentChannel, currentUser }) => {
 		setState({ ...state, numUniqueUsers })
 	}
 
-	const displayChannelName = channel => channel ? `${channel.name}` : ''
+	const displayChannelName = channel => {
+		return channel ? `${privateChannel ? '@' : '#'}${channel.name}` : ""
+	}
 
 	const displayMessages = messages => {
 		return (
@@ -106,7 +116,7 @@ const Messages = ({ currentChannel, currentUser }) => {
 
 	return (
 		<React.Fragment>
-			<MessagesHeader searchLoading={searchLoading} handleSearchChange={handleSearchChange} channelName={displayChannelName(channel)} numUniqueUsers={numUniqueUsers} />
+			<MessagesHeader searchLoading={searchLoading} handleSearchChange={handleSearchChange} channelName={displayChannelName(channel)} numUniqueUsers={numUniqueUsers} isPrivateChannel={privateChannel} />
 
 			<Segment>
 				<Comment.Group className={progressBar ? 'messages__progress' : 'messages'}>
@@ -115,7 +125,7 @@ const Messages = ({ currentChannel, currentUser }) => {
 				</Comment.Group>
 			</Segment>
 
-			<MessageForm messagesRef={messagesRef} isProgressBarVisible={isProgressBarVisible} />
+			<MessageForm getMessagesRef={getMessagesRef} isPrivateChannel={privateChannel} messagesRef={messagesRef} isProgressBarVisible={isProgressBarVisible} />
 		</React.Fragment>
 	);
 };
@@ -123,6 +133,7 @@ const Messages = ({ currentChannel, currentUser }) => {
 const mapStateToProps = (state) => ({
 	currentUser: state.user.currentUser,
 	currentChannel: state.channel.currentChannel,
+	isPrivateChannel: state.channel.isPrivateChannel
 });
 
 export default connect(mapStateToProps)(Messages);
