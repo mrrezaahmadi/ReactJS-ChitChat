@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import firebase from "../../firebase/firebase.config";
 
+import { useStateWithCallbackLazy } from 'use-state-with-callback'
+
 // Styles
 import { Menu, Icon, Modal, Form, Input, Button } from "semantic-ui-react";
 import { connect } from "react-redux";
@@ -8,44 +10,39 @@ import { connect } from "react-redux";
 import { setCurrentChannel } from "../../redux/channel/channel.action";
 
 const Channels = ({ currentUser, setCurrentChannel }) => {
-	const [channelsBar, setChannelsBar] = useState({
+
+	const [state, setState] = useStateWithCallbackLazy({
+		user: currentUser,
 		channels: [],
 		channelName: "",
 		channelDetails: "",
+		channelsRef: firebase.database().ref("channels"),
+		modal: false,
 		firstLoad: true,
-		activeChannel: "",
-	});
-	const [modal, setModal] = useState(false);
-	const channelsRef = firebase.database().ref("channels");
+		activeChannel: ""
+	})
 
-	const {
-		activeChannel,
-		firstLoad,
-		channels,
-		channelName,
-		channelDetails,
-	} = channelsBar;
+	const { user, channels, channelName, channelDetails, channelsRef, modal, firstLoad, activeChannel } = state
 
 	useEffect(() => {
 		addListeners();
-    }, []);
-    
-    useEffect(() => {
-        return () => {
-            removeListeners()
-        }
-    }, [])
+		return () => {
+			removeListeners()
+		}
+	}, []);
 
-    const removeListeners = () => {
-        channelsRef.off()
-    }
+
+
+	const removeListeners = () => {
+		channelsRef.off()
+	}
 
 	const closeModal = () => {
-		setModal(false);
+		setState({ ...state, modal: false })
 	};
 
 	const openModal = () => {
-		setModal(true);
+		setState({ ...state, modal: true })
 	};
 
 	const addListeners = () => {
@@ -53,20 +50,24 @@ const Channels = ({ currentUser, setCurrentChannel }) => {
 		channelsRef.on("child_added", (snap) => {
 			loadedChannels.push(snap.val());
 			// console.log(loadedChannels);
-			setChannelsBar({
-				...channelsBar,
-				channels: [...channels, ...loadedChannels],
-			});
+			setState({ ...state, channels: [...channels, ...loadedChannels] })
 		});
 	};
 
-	useEffect(() => {
+	// useEffect(() => {
+	// 	if (firstLoad && channels.length > 0) {
+	// 		setCurrentChannel(channels[0]);
+	// 		setActiveChannel(channels[0]);
+	// 	}
+	// 	setState({...state, firstLoad: false})
+	// }, [channels]);
+
+	const setFirstChannel = () => {
 		if (firstLoad && channels.length > 0) {
-			setCurrentChannel(channels[0]);
-			handleActiveChannel(channels[0]);
+			setCurrentChannel(channels[0])
+			setActiveChannel(channels[0])
 		}
-		setChannelsBar({ ...channelsBar, firstLoad: false });
-	}, [channels]);
+	}
 
 	const addChannel = () => {
 		const key = channelsRef.push().key;
@@ -76,8 +77,8 @@ const Channels = ({ currentUser, setCurrentChannel }) => {
 			name: channelName,
 			details: channelDetails,
 			createdBy: {
-				name: currentUser.displayName,
-				avatar: currentUser.photoURL,
+				name: user.displayName,
+				avatar: user.photoURL,
 			},
 		};
 
@@ -85,7 +86,7 @@ const Channels = ({ currentUser, setCurrentChannel }) => {
 			.child(key)
 			.update(newChannel)
 			.then(() => {
-				setChannelsBar({ ...channelsBar, channelName: "", channelDetails: "" });
+				setState({...state, channelDetails: "", channelName: ""})
 				closeModal();
 				console.log("channel added");
 			})
@@ -96,7 +97,7 @@ const Channels = ({ currentUser, setCurrentChannel }) => {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		if (isFormValid(channelsBar)) {
+		if (isFormValid(state)) {
 			addChannel();
 		}
 	};
@@ -107,16 +108,16 @@ const Channels = ({ currentUser, setCurrentChannel }) => {
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
-		setChannelsBar({ ...channelsBar, [name]: value });
+		setState({...state, [name]: value})
 	};
 
-	const changeChannel = (channel) => {
-		handleActiveChannel(channel);
-		setCurrentChannel(channel);
+	const changeChannel = (chnl) => {
+		setActiveChannel(chnl);
+		setCurrentChannel(chnl);
 	};
 
-	const handleActiveChannel = (channel) => {
-		setChannelsBar({ ...channelsBar, activeChannel: channel.id });
+	const setActiveChannel = (channel) => {
+		setState({...state, activeChannel: channel.id})
 	};
 
 	return (

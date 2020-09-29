@@ -13,7 +13,7 @@ import "./messages-form.styles.scss";
 import FileModal from "../file-modal/file-modal.component";
 import ProgressBar from '../progress-bar/progress-bar.component'
 
-const MessagesFrom = ({ currentUser, currentChannel, messagesRef }) => {
+const MessagesFrom = ({ currentUser, currentChannel, messagesRef, isProgressBarVisible }) => {
 	const storageRef = firebase.storage().ref();
 
 	const [state, setState] = useStateWithCallbackLazy({
@@ -109,6 +109,7 @@ const MessagesFrom = ({ currentUser, currentChannel, messagesRef }) => {
 						const percentUploaded = Math.round(
 							(snap.bytesTransferred / snap.totalBytes) * 100
 						);
+						isProgressBarVisible(percentUploaded)
 						setState({ ...state, percentUploaded });
 					},
 					(error) => {

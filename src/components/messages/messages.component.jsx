@@ -3,6 +3,8 @@ import { Segment, Comment } from "semantic-ui-react";
 import firebase from "../../firebase/firebase.config";
 import { connect } from "react-redux";
 
+import { useStateWithCallbackLazy } from 'use-state-with-callback'
+
 import MessagesHeader from "../messages-header/messages-header.component";
 import MessageForm from "../messages-form/messages-form.component";
 import Message from "../message/message.component";
@@ -10,15 +12,23 @@ import Message from "../message/message.component";
 import "./messages.styles.scss";
 
 const Messages = ({ currentChannel, currentUser }) => {
-    const [messages, setMessages] = useState([]);
-    const [messagesRef, setMessagesRef] = useState(firebase.database().ref("messages"))
-	const [messagesLoading, setMessagesLoading] = useState(false);
+
+	const [state, setState] = useStateWithCallbackLazy({
+		messages: [],
+		messagesLoading: true,
+		channel: currentChannel,
+		user: currentUser,
+		messagesRef: firebase.database().ref("messages"),
+		progressBar: false
+	})
+
+	const { messages, messagesLoading, messagesRef, channel, user, progressBar } = state
 
 	useEffect(() => {
-		if (currentChannel && currentUser) {
-			addListener(currentChannel.id);
+		if (channel && user) {
+			addListener(channel.id);
 		}
-	}, [currentChannel, currentUser, messagesRef]);
+	}, []);
 
 	const addListener = (channelId) => {
 		addMessageListener(channelId);
@@ -29,19 +39,23 @@ const Messages = ({ currentChannel, currentUser }) => {
 		messagesRef.child(channelId).on("child_added", (snap) => {
 			loadedMessages.push(snap.val());
 			// console.log("loaded messages", loadedMessages);
-			setMessages([ ...messages, ...loadedMessages ]);
-			setMessages(loadedMessages);
-			setMessagesLoading(false);
+			setState({ ...state, messages: [...messages, ...loadedMessages], messagesLoading: false })
 		});
 	};
+
+	const isProgressBarVisible = percent => {
+		if (percent > 0) {
+			setState({ ...state, progressBar: true })
+		}
+	}
 
 	return (
 		<React.Fragment>
 			<MessagesHeader />
 
 			<Segment>
-				<Comment.Group className="messages">
-                    {/* {console.log(messages)} */}
+				<Comment.Group className={progressBar ? 'messages__progress' : 'messages'}>
+					{/* {console.log(messages)} */}
 					{messages.length > 0 &&
 						messages.map((message, index) => (
 							<Message
@@ -53,7 +67,7 @@ const Messages = ({ currentChannel, currentUser }) => {
 				</Comment.Group>
 			</Segment>
 
-			<MessageForm messagesRef={messagesRef} />
+			<MessageForm messagesRef={messagesRef} isProgressBarVisible={isProgressBarVisible} />
 		</React.Fragment>
 	);
 };
