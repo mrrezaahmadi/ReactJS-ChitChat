@@ -186,6 +186,7 @@ const MessagesFrom = ({ currentUser, currentChannel, messagesRef, isProgressBarV
 				/>
 				<Button
 					onClick={openModal}
+					disabled={uploadState === 'uploading'}
 					color="teal"
 					content="Upload Media"
 					labelPosition="right"

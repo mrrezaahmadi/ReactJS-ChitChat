@@ -19,10 +19,11 @@ const Messages = ({ currentChannel, currentUser }) => {
 		channel: currentChannel,
 		user: currentUser,
 		messagesRef: firebase.database().ref("messages"),
-		progressBar: false
+		progressBar: false,
+		numUniqueUsers: ''
 	})
 
-	const { messages, messagesLoading, messagesRef, channel, user, progressBar } = state
+	const { messages, messagesLoading, messagesRef, channel, user, progressBar, numUniqueUsers } = state
 
 	useEffect(() => {
 		if (channel && user) {
@@ -41,6 +42,7 @@ const Messages = ({ currentChannel, currentUser }) => {
 			// console.log("loaded messages", loadedMessages);
 			setState({ ...state, messages: [...messages, ...loadedMessages], messagesLoading: false })
 		});
+		countUniqueUsers(loadedMessages)
 	};
 
 	const isProgressBarVisible = percent => {
@@ -49,9 +51,25 @@ const Messages = ({ currentChannel, currentUser }) => {
 		}
 	}
 
+	const countUniqueUsers = messages => {
+		const uniqueUsers = messages.reduce((acc, message) => {
+			if (!acc.includes(message.user.name)) {
+				acc.push(message.user.name)
+			}
+			return acc
+		}, [])
+
+		const plural = uniqueUsers.length > 1 || uniqueUsers.length === 0;
+
+		const numUniqueUsers = `${uniqueUsers.length} user${plural ? 's' : ''}`
+		setState({ ...state, numUniqueUsers })
+	}
+
+	const displayChannelName = channel => channel ? `${channel.name}` : ''
+
 	return (
 		<React.Fragment>
-			<MessagesHeader />
+			<MessagesHeader channelName={displayChannelName(channel)} numUniqueUsers={numUniqueUsers} />
 
 			<Segment>
 				<Comment.Group className={progressBar ? 'messages__progress' : 'messages'}>
