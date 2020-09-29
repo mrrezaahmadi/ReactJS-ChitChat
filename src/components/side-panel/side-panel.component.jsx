@@ -1,6 +1,5 @@
 import React from "react";
 import { Menu } from "semantic-ui-react";
-import { connect } from 'react-redux'
 
 import UserPanel from "../user-panel/user-panel.component";
 import Channels from "../channels/channels.component";
@@ -17,13 +16,11 @@ const SidePanel = ({ currentUser }) => {
 		>
 			<UserPanel />
 			<Channels />
-			<DirectMessages currentUser={currentUser} />
+			<DirectMessages />
 		</Menu>
 	);
 };
 
-const mapStateToProps = state => ({
-	currentUser: state.user.currentUser
-})
 
-export default connect(mapStateToProps)(SidePanel);
+
+export default SidePanel;

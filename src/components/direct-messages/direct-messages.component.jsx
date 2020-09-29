@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Menu, Icon } from 'semantic-ui-react'
+import { connect } from 'react-redux'
+
+import { setCurrentChannel, setPrivateChannel } from '../../redux/channel/channel.action'
 
 import firebase from '../../firebase/firebase.config'
 
-const DirectMessages = ({ currentUser }) => {
+const DirectMessages = ({ currentUser, setCurrentChannel, setPrivateChannel }) => {
 
     const [state, setState] = useState({
         users: [],
@@ -71,6 +74,20 @@ const DirectMessages = ({ currentUser }) => {
         return user.status === 'online'
     }
 
+    const changeChannel = user => {
+        const channelId = getChannelId(user.uid)
+        const channelData = {
+            id: channelId,
+            name: user.name,
+        }
+        setCurrentChannel(channelData)
+        setPrivateChannel(true)
+    }
+
+    const getChannelId = userId => {
+        const currentUserUid = user.uid
+        return userId < currentUserUid ? `${userId}/${currentUserUid}` : `${currentUserUid}/${userId}`
+    }
 
     return (
         <Menu.Menu className="menu" >
@@ -81,7 +98,7 @@ const DirectMessages = ({ currentUser }) => {
                 ({users.length})
             </Menu.Item>
             {users.map(item => (
-                <Menu.Item key={item.uid} onClick={() => console.log(user)} style={{ opacity: 0.7, fontStyle: 'italic' }} >
+                <Menu.Item key={item.uid} onClick={changeChannel(item)} style={{ opacity: 0.7, fontStyle: 'italic' }} >
                     <Icon name="circle" color={isUserOnline(item) ? 'green' : 'red'} />
                     @ {item.name}
                 </Menu.Item>
@@ -90,4 +107,8 @@ const DirectMessages = ({ currentUser }) => {
     )
 }
 
-export default DirectMessages
+const mapStateToProps = state => ({
+    currentUser: state.user.currentUser
+})
+
+export default connect(mapStateToProps, { setPrivateChannel, setCurrentChannel })(DirectMessages)
