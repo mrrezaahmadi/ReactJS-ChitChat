@@ -6,6 +6,7 @@ import { useStateWithCallbackLazy } from 'use-state-with-callback'
 // Styles
 import { Menu, Icon, Modal, Form, Input, Button } from "semantic-ui-react";
 import { connect } from "react-redux";
+import './channels.styles.scss'
 
 import { setCurrentChannel } from "../../redux/channel/channel.action";
 
@@ -115,7 +116,7 @@ const Channels = ({ currentUser, setCurrentChannel }) => {
 
 	return (
 		<React.Fragment>
-			<Menu.Menu style={{ paddingBottom: "2rm" }}>
+			<Menu.Menu className="menu">
 				<Menu.Item>
 					<span>
 						<Icon name="exchange" /> CHANNELS
