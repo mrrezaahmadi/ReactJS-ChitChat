@@ -1,9 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Segment, Comment } from "semantic-ui-react";
 import firebase from "../../firebase/firebase.config";
-import { connect } from "react-redux";
-
-import { useStateWithCallbackLazy } from 'use-state-with-callback'
 
 import MessagesHeader from "../messages-header/messages-header.component";
 import MessageForm from "../messages-form/messages-form.component";
@@ -11,129 +8,137 @@ import Message from "../message/message.component";
 
 import "./messages.styles.scss";
 
-const Messages = ({ currentChannel, currentUser, isPrivateChannel }) => {
-
-	const [state, setState] = useStateWithCallbackLazy({
-		privateMessagesRef: firebase.database().ref('privateMessages'),
+class Messages extends React.Component {
+	state = {
+		privateChannel: this.props.isPrivateChannel,
+		privateMessagesRef: firebase.database().ref("privateMessages"),
+		messagesRef: firebase.database().ref("messages"),
 		messages: [],
 		messagesLoading: true,
-		channel: currentChannel,
-		user: currentUser,
-		messagesRef: firebase.database().ref("messages"),
-		progressBar: false,
-		numUniqueUsers: '',
+		channel: this.props.currentChannel,
+		user: this.props.currentUser,
+		numUniqueUsers: "",
 		searchTerm: "",
 		searchLoading: false,
-		searchResult: [],
-		privateChannel: isPrivateChannel
-	})
-
-	const { privateChannel, messages, messagesRef, channel, user, progressBar, numUniqueUsers, searchTerm, searchLoading, searchResult } = state
-
-	useEffect(() => {
-		if (channel && user) {
-			addListener(channel.id);
-		}
-	}, []);
-
-	const addListener = (channelId) => {
-		addMessageListener(channelId);
+		searchResults: [],
 	};
 
-	const addMessageListener = (channelId) => {
+	componentDidMount() {
+		const { channel, user } = this.state;
+
+		if (channel && user) {
+			this.addListeners(channel.id);
+		}
+	}
+
+	addListeners = (channelId) => {
+		this.addMessageListener(channelId);
+	};
+
+	addMessageListener = (channelId) => {
 		let loadedMessages = [];
-		const ref = getMessagesRef()
+		const ref = this.getMessagesRef();
 		ref.child(channelId).on("child_added", (snap) => {
 			loadedMessages.push(snap.val());
-			// console.log("loaded messages", loadedMessages);
-			setState({ ...state, messages: [...messages, ...loadedMessages], messagesLoading: false })
+			this.setState({
+				messages: loadedMessages,
+				messagesLoading: false,
+			});
+			this.countUniqueUsers(loadedMessages);
 		});
-		countUniqueUsers(loadedMessages)
 	};
 
-	const getMessagesRef = () => {
-		const { messagesRef, privateMessagesRef, privateChannel } = state
-		return privateChannel ? privateMessagesRef : messagesRef
-	} 
+	getMessagesRef = () => {
+		const { messagesRef, privateMessagesRef, privateChannel } = this.state;
+		return privateChannel ? privateMessagesRef : messagesRef;
+	};
 
-	const isProgressBarVisible = percent => {
-		if (percent > 0) {
-			setState({ ...state, progressBar: true })
-		}
-	}
+	handleSearchChange = (event) => {
+		this.setState(
+			{
+				searchTerm: event.target.value,
+				searchLoading: true,
+			},
+			() => this.handleSearchMessages()
+		);
+	};
 
-	const handleSearchChange = e => {
-		setState({ ...state, searchTerm: e.target.value, searchLoading: true }, () => {
-			handleSearchMessages()
-		})
-	}
-
-	const handleSearchMessages = () => {
-		const channelMessages = [...messages]
-		const regex = new RegExp(searchTerm, 'gi')
-		const searchResult = channelMessages.reduce((acc, message) => {
-			if ((message.content && message.content.match(regex)) || message.user.name.match(regex)) {
-				acc.push(message)
+	handleSearchMessages = () => {
+		const channelMessages = [...this.state.messages];
+		const regex = new RegExp(this.state.searchTerm, "gi");
+		const searchResults = channelMessages.reduce((acc, message) => {
+			if (
+				(message.content && message.content.match(regex)) ||
+				message.user.name.match(regex)
+			) {
+				acc.push(message);
 			}
-			return acc
-		}, [])
-		setState({ ...state, searchResult })
-		setTimeout(() => {
-			setState({ ...state, searchLoading: false })
-		}, 1000)
-	}
+			return acc;
+		}, []);
+		this.setState({ searchResults });
+		setTimeout(() => this.setState({ searchLoading: false }), 1000);
+	};
 
-	const countUniqueUsers = messages => {
+	countUniqueUsers = (messages) => {
 		const uniqueUsers = messages.reduce((acc, message) => {
 			if (!acc.includes(message.user.name)) {
-				acc.push(message.user.name)
+				acc.push(message.user.name);
 			}
-			return acc
-		}, [])
-
+			return acc;
+		}, []);
 		const plural = uniqueUsers.length > 1 || uniqueUsers.length === 0;
+		const numUniqueUsers = `${uniqueUsers.length} user${plural ? "s" : ""}`;
+		this.setState({ numUniqueUsers });
+	};
 
-		const numUniqueUsers = `${uniqueUsers.length} user${plural ? 's' : ''}`
-		setState({ ...state, numUniqueUsers })
-	}
+	displayMessages = (messages) =>
+		messages.length > 0 &&
+		messages.map((message) => (
+			<Message
+				key={message.timestamp}
+				message={message}
+				user={this.state.user}
+			/>
+		));
 
-	const displayChannelName = channel => {
-		return channel ? `${privateChannel ? '@' : '#'}${channel.name}` : ""
-	}
+	displayChannelName = (channel) => {
+		return channel
+			? `${this.state.privateChannel ? "@" : "#"}${channel.name}`
+			: "";
+	};
 
-	const displayMessages = messages => {
+	render() {
+		// prettier-ignore
+		const { messagesRef, messages, channel, user, numUniqueUsers, searchTerm, searchResults, searchLoading, privateChannel } = this.state;
+
 		return (
-			messages.length > 0 &&
-			messages.map((message, index) => (
-				<Message
-					key={index}
-					message={message}
-					user={currentUser}
+			<React.Fragment>
+				<MessagesHeader
+					channelName={this.displayChannelName(channel)}
+					numUniqueUsers={numUniqueUsers}
+					handleSearchChange={this.handleSearchChange}
+					searchLoading={searchLoading}
+					isPrivateChannel={privateChannel}
 				/>
-			))
-		)
+
+				<Segment>
+					<Comment.Group className="messages">
+						{searchTerm
+							? this.displayMessages(searchResults)
+							: this.displayMessages(messages)}
+					</Comment.Group>
+				</Segment>
+
+				<MessageForm
+					messagesRef={messagesRef}
+					currentChannel={channel}
+					currentUser={user}
+					isPrivateChannel={privateChannel}
+					getMessagesRef={this.getMessagesRef}
+				/>
+			</React.Fragment>
+		);
 	}
+}
 
-	return (
-		<React.Fragment>
-			<MessagesHeader searchLoading={searchLoading} handleSearchChange={handleSearchChange} channelName={displayChannelName(channel)} numUniqueUsers={numUniqueUsers} isPrivateChannel={privateChannel} />
-
-			<Segment>
-				<Comment.Group className={progressBar ? 'messages__progress' : 'messages'}>
-					{/* {console.log(messages)} */}
-					{searchTerm ? displayMessages(searchResult) : displayMessages(messages)}
-				</Comment.Group>
-			</Segment>
-
-			<MessageForm getMessagesRef={getMessagesRef} isPrivateChannel={privateChannel} messagesRef={messagesRef} isProgressBarVisible={isProgressBarVisible} />
-		</React.Fragment>
-	);
-};
-
-const mapStateToProps = (state) => ({
-	currentUser: state.user.currentUser,
-	currentChannel: state.channel.currentChannel,
-	isPrivateChannel: state.channel.isPrivateChannel
-});
-
-export default connect(mapStateToProps)(Messages);
+export default Messages;
