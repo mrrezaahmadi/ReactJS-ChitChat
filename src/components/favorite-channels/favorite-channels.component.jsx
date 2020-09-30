@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Menu, Icon } from "semantic-ui-react";
+import firebase from "../../firebase/firebase.config";
 
 import { connect } from "react-redux";
 
@@ -10,8 +11,42 @@ import {
 
 class Favorites extends Component {
 	state = {
+		user: this.props.currentUser,
+		usersRef: firebase.database().ref("users"),
 		favoriteChannels: [],
 		activeChannel: "",
+	};
+
+	componentDidMount() {
+		if (this.state.user) {
+			this.addListeners(this.state.user.uid);
+		}
+	}
+
+	addListeners = (userId) => {
+		this.state.usersRef
+			.child(userId)
+			.child("starred")
+			.on("child_added", (snap) => {
+				const favoriteChannel = { id: snap.key, ...snap.val() };
+				this.setState({
+					favoriteChannels: [...this.state.favoriteChannels, favoriteChannel],
+				});
+			});
+
+		this.state.usersRef
+			.child(userId)
+			.child("starred")
+			.on("child_removed", (snap) => {
+				const channelToRemove = { id: snap.key, ...snap.val() };
+				const filteredChannels = this.state.favoriteChannels.filter(
+					(channel) => {
+						return channel.id !== channelToRemove.id;
+					}
+				);
+
+				this.setState({ favoriteChannels: filteredChannels });
+			});
 	};
 
 	setActiveChannel = (channel) => {
