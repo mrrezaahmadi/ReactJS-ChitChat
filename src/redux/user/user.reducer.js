@@ -1,8 +1,9 @@
-import * as actionTypes from './user.types'
+import actionTypes from './user.types'
 
 const INITIAL_STATE = {
     currentUser: null,
-    isLoading: true
+    isLoading: true,
+    userPosts: null
 }
 
 const userReducer = (state = INITIAL_STATE, action) => {
@@ -17,6 +18,11 @@ const userReducer = (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 isLoading: false
+            }
+        case actionTypes.SET_USER_POSTS:
+            return {
+                ...state,
+                userPosts: action.payload.userPosts
             }
         default:
             return state

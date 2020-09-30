@@ -1,3 +1,5 @@
-export const SET_USER = 'SET_USER'
-
-export const CLEAR_USER = 'CLEAR_USER'
+export default {
+    SET_USER: 'SET_USER',
+    SET_USER_POSTS: 'SET_USER_POSTS',
+    CLEAR_USER: 'CLEAR_USER'
+}

@@ -1,4 +1,4 @@
-import * as actionTypes from './user.types'
+import actionTypes from './user.types'
 
 export const setUser = user => ({
     type: actionTypes.SET_USER,
@@ -9,4 +9,11 @@ export const setUser = user => ({
 
 export const clearUser = () => ({
     type: actionTypes.CLEAR_USER
+})
+
+export const setUserPosts = (userPosts) => ({
+    type: actionTypes.SET_USER_POSTS,
+    payload: {
+        userPosts
+    }
 })
