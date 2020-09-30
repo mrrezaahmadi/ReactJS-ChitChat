@@ -10,6 +10,10 @@ import {
 	Segment,
 } from "semantic-ui-react";
 
+import { connect } from "react-redux";
+
+import { setColors } from "../../redux/colors/colors.action";
+
 import firebase from "../../firebase/firebase.config";
 
 import { SliderPicker } from "react-color";
@@ -21,6 +25,22 @@ export class ColorPanel extends Component {
 		secondary: "",
 		usersRef: firebase.database().ref("users"),
 		user: this.props.currentUser,
+		userColors: [],
+	};
+
+	componentDidMount() {
+		if (this.state.user) {
+			this.addListener(this.state.user.uid);
+		}
+	}
+
+	addListener = (userId) => {
+		let userColors = [];
+		this.state.usersRef.child(`${userId}/colors`).on("child_added", (snap) => {
+			userColors.unshift(snap.val());
+			// console.log(userColors)
+			this.setState({ userColors });
+		});
 	};
 
 	handleChangePrimary = (color) => {
@@ -61,8 +81,27 @@ export class ColorPanel extends Component {
 			});
 	};
 
+	displayUserColors = (colors) =>
+		colors.length > 0 &&
+		colors.map((color, i) => (
+			<React.Fragment key={i}>
+				<Divider />
+				<div
+					className="color__container"
+					onClick={() => this.props.setColors(color.primary, color.secondary)}
+				>
+					<div className="color__square" style={{ background: color.primary }}>
+						<div
+							className="color__overlay"
+							style={{ background: color.secondary }}
+						></div>
+					</div>
+				</div>
+			</React.Fragment>
+		));
+
 	render() {
-		const { modal, primary, secondary } = this.state;
+		const { modal, primary, secondary, userColors } = this.state;
 		return (
 			<Sidebar
 				as={Menu}
@@ -74,7 +113,7 @@ export class ColorPanel extends Component {
 			>
 				<Divider />
 				<Button icon="add" size="small" color="blue" onClick={this.openModal} />
-
+				{this.displayUserColors(userColors)}
 				{/* Color Picker Modal */}
 				<Modal basic open={modal} onClose={this.closeModal}>
 					<Modal.Header>Choose App Colors</Modal.Header>
@@ -111,4 +150,4 @@ export class ColorPanel extends Component {
 	}
 }
 
-export default ColorPanel;
+export default connect(null, { setColors })(ColorPanel);
