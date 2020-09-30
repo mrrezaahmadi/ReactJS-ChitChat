@@ -1,15 +1,16 @@
 import React from "react";
 import { Header, Segment, Icon, Input } from "semantic-ui-react";
 
-const MessagesHeader = ({
-	isPrivateChannel,
-	searchLoading,
-	handleSearchChange,
-	channelName,
-	numUniqueUsers,
-	handleStar,
-	isChannelStarred,
-}) => {
+const MessagesHeader = (props) => {
+	const {
+		isPrivateChannel,
+		searchLoading,
+		handleSearchChange,
+		channelName,
+		numUniqueUsers,
+		handleStar,
+		isChannelStarred,
+	} = props;
 	return (
 		<Segment clearing>
 			{/* Channel Title */}
