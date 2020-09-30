@@ -1,71 +1,113 @@
 import React from "react";
 import firebase from "../../firebase/firebase.config";
-import { connect } from "react-redux";
 
 // Styles
-import { Grid, Header, Icon, Dropdown, Image } from "semantic-ui-react";
+import {
+	Grid,
+	Header,
+	Icon,
+	Dropdown,
+	Image,
+	Button,
+	Modal,
+	Input,
+} from "semantic-ui-react";
 
-const handleSignout = () => {
-	firebase
-		.auth()
-		.signOut()
-		.then(() => {
-			console.log("signed out");
-		});
-};
+class UserPanel extends React.Component {
+	state = {
+		user: this.props.currentUser,
+		modal: false,
+	};
 
-const UserPanel = ({ currentUser, primaryColor }) => {
-	const dropdownOptions = () => [
+	openModal = () => this.setState({ modal: true });
+
+	closeModal = () => this.setState({ modal: false });
+
+	dropdownOptions = () => [
 		{
 			key: "user",
 			text: (
 				<span>
-					Signed in as{" "}
-					<strong>{currentUser ? currentUser.displayName : "Guest"}</strong>
+					Signed in as <strong>{this.state.user.displayName}</strong>
 				</span>
 			),
 			disabled: true,
 		},
 		{
 			key: "avatar",
-			text: <span>Change avatar</span>,
+			text: <span onClick={this.openModal}>Change Avatar</span>,
 		},
 		{
 			key: "signout",
-			text: <span onClick={handleSignout}>Sign Out</span>,
+			text: <span onClick={this.handleSignout}>Sign Out</span>,
 		},
 	];
-	return (
-		<Grid style={{ background: primaryColor }}>
-			<Grid.Column>
-				<Grid.Row style={{ padding: "1.2rem", margin: 0 }}>
-					<Header inverted floated="left" as="h2">
-						<Icon name="code" />
-						<Header.Content>DevChat</Header.Content>
-					</Header>
-					<Header style={{ padding: "0.25em" }} as="h4" inverted>
-						<Dropdown
-							trigger={
-								currentUser ? (
+
+	handleSignout = () => {
+		firebase
+			.auth()
+			.signOut()
+			.then(() => console.log("signed out!"));
+	};
+
+	render() {
+		const { user, modal } = this.state;
+		const { primaryColor } = this.props;
+
+		return (
+			<Grid style={{ background: primaryColor }}>
+				<Grid.Column>
+					<Grid.Row style={{ padding: "1.2em", margin: 0 }}>
+						{/* App Header */}
+						<Header inverted floated="left" as="h2">
+							<Icon name="code" />
+							<Header.Content>DevChat</Header.Content>
+						</Header>
+
+						{/* User Dropdown  */}
+						<Header style={{ padding: "0.25em" }} as="h4" inverted>
+							<Dropdown
+								trigger={
 									<span>
-										<Image src={currentUser.photoURL} spaced="right" avatar />
-										{currentUser.displayName}
+										<Image src={user.photoURL} spaced="right" avatar />
+										{user.displayName}
 									</span>
-								) : (
-									<span>Guest</span>
-								)
-							}
-							options={dropdownOptions()}
-						/>
-					</Header>
-				</Grid.Row>
-			</Grid.Column>
-		</Grid>
-	);
-};
+								}
+								options={this.dropdownOptions()}
+							/>
+						</Header>
+					</Grid.Row>
 
-const mapStateToProps = (state) => ({
-	currentUser: state.user.currentUser,
-});
+					{/* Change User Avatar Modal   */}
+					<Modal basic open={modal} onClose={this.closeModal}>
+						<Modal.Header>Change Avatar</Modal.Header>
+						<Modal.Content>
+							<Input fluid type="file" label="New Avatar" name="previewImage" />
+							<Grid centered stackable columns={2}>
+								<Grid.Row centered>
+									<Grid.Column className="ui center aligned grid">
+										{/* Image Preview */}
+									</Grid.Column>
+									<Grid.Column>{/* Cropped Image Preview */}</Grid.Column>
+								</Grid.Row>
+							</Grid>
+						</Modal.Content>
+						<Modal.Actions>
+							<Button color="green" inverted>
+								<Icon name="save" /> Change Avatar
+							</Button>
+							<Button color="green" inverted>
+								<Icon name="image" /> Preview
+							</Button>
+							<Button color="red" inverted onClick={this.closeModal}>
+								<Icon name="remove" /> Cancel
+							</Button>
+						</Modal.Actions>
+					</Modal>
+				</Grid.Column>
+			</Grid>
+		);
+	}
+}
 
-export default connect(mapStateToProps)(UserPanel);
+export default UserPanel;
