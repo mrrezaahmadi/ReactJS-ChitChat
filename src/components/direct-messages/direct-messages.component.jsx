@@ -12,6 +12,7 @@ import firebase from "../../firebase/firebase.config";
 class DirectMessages extends React.Component {
 	state = {
 		activeChannel: "",
+		user: this.props.currentUser,
 		users: [],
 		usersRef: firebase.database().ref("users"),
 		connectedRef: firebase.database().ref(".info/connected"),
@@ -19,8 +20,8 @@ class DirectMessages extends React.Component {
 	};
 
 	componentDidMount() {
-		if (this.props.currentUser) {
-			this.addListeners(this.props.currentUser.uid);
+		if (this.state.user) {
+			this.addListeners(this.state.user.uid);
 		}
 	}
 
@@ -85,7 +86,7 @@ class DirectMessages extends React.Component {
 	};
 
 	getChannelId = (userId) => {
-		const currentUserId = this.props.currentUser.uid;
+		const currentUserId = this.state.user.uid;
 		return userId < currentUserId
 			? `${userId}/${currentUserId}`
 			: `${currentUserId}/${userId}`;
@@ -125,11 +126,6 @@ class DirectMessages extends React.Component {
 	}
 }
 
-const mapStateToProps = (state) => ({
-	currentUser: state.user.currentUser,
-});
-
-export default connect(mapStateToProps, {
-	setPrivateChannel,
-	setCurrentChannel,
-})(DirectMessages);
+export default connect(null, { setCurrentChannel, setPrivateChannel })(
+	DirectMessages
+);
