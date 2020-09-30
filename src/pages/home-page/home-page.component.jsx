@@ -13,7 +13,7 @@ import Messages from "../../components/messages/messages.component";
 
 const Home = ({ currentUser, currentChannel, isPrivateChannel, userPosts }) => (
 	<Grid columns="equal" className="app" style={{ background: "#eee" }}>
-		<ColorPanel />
+		<ColorPanel key={currentUser && currentUser.name} currentUser={currentUser} />
 		<SidePanel key={currentUser && currentUser.uid} currentUser={currentUser} />
 
 		<Grid.Column style={{ marginLeft: 320 }}>
