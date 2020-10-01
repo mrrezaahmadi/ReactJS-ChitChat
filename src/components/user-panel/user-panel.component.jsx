@@ -58,7 +58,7 @@ class UserPanel extends React.Component {
 		firebase
 			.auth()
 			.signOut()
-			.then(() => console.log("signed out!"));
+			// .then(() => console.log("signed out!"));
 	};
 
 	handleChange = (e) => {
@@ -93,7 +93,7 @@ class UserPanel extends React.Component {
 				photoURL: this.state.uploadedCroppedImage,
 			})
 			.then(() => {
-				console.log("Photo URL updated!");
+				// console.log("Photo URL updated!");
 				this.closeModal();
 			})
 			.catch((err) => {
@@ -104,10 +104,10 @@ class UserPanel extends React.Component {
 			.child(this.state.user.uid)
 			.update({ avatar: this.state.uploadedCroppedImage })
 			.then(() => {
-				console.log("User avatar updated");
+				// console.log("User avatar updated");
 			})
 			.catch((err) => {
-				console.log(err);
+				console.error(err);
 			});
 	};
 

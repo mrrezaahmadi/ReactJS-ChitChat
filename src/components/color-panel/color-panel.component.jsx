@@ -50,7 +50,6 @@ export class ColorPanel extends Component {
 		let userColors = [];
 		this.state.usersRef.child(`${userId}/colors`).on("child_added", (snap) => {
 			userColors.unshift(snap.val());
-			// console.log(userColors)
 			this.setState({ userColors });
 		});
 	};
@@ -85,7 +84,7 @@ export class ColorPanel extends Component {
 				secondary,
 			})
 			.then(() => {
-				console.log("colors added");
+				// console.log("colors added");
 				this.closeModal();
 			})
 			.catch((err) => {

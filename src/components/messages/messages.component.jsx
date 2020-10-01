@@ -214,8 +214,6 @@ class Messages extends React.Component {
 			return acc;
 		}, {});
 
-		console.log(userPosts);
-
 		this.props.setUserPosts(userPosts);
 	};
 
@@ -230,7 +228,7 @@ class Messages extends React.Component {
 
 	starChannel = () => {
 		if (this.state.isChannelStarred) {
-			console.log("starred");
+			// console.log("starred");
 			this.state.usersRef.child(`${this.state.user.uid}/starred`).update({
 				[this.state.channel.id]: {
 					name: this.state.channel.name,
@@ -242,7 +240,7 @@ class Messages extends React.Component {
 				},
 			});
 		} else {
-			console.log("unstarred");
+			// console.log("unstarred");
 			this.state.usersRef
 				.child(`${this.state.user.uid}/starred`)
 				.child(this.state.channel.id)

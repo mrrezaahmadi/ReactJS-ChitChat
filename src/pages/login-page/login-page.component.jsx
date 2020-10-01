@@ -39,7 +39,7 @@ const Login = () => {
 					// console.log(singedInUser);
 				})
 				.catch((error) => {
-					console.log(error);
+					console.error(error);
 					setErrors(error);
 					setLoading(false);
 				});

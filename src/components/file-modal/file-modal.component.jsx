@@ -11,7 +11,7 @@ const FileModal = ({ modal, closeModal, uploadFile }) => {
 
 	const addFile = (e) => {
 		const file = e.target.files[0];
-		console.log(file);
+		// console.log(file);
 		if (file) {
 			setState({ ...state, file: file })
 		}
