@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import "./color-panel.styles.scss";
+
 import {
 	Sidebar,
 	Menu,
@@ -19,6 +19,9 @@ import firebase from "../../firebase/firebase.config";
 
 import { SliderPicker } from "react-color";
 
+import "./color-panel.styles.scss";
+
+
 export class ColorPanel extends Component {
 	state = {
 		modal: false,
@@ -36,12 +39,12 @@ export class ColorPanel extends Component {
 	}
 
 	componentWillUnmount() {
-		this.removeListener();
+		this.removeListener()
 	}
 
 	removeListener = () => {
-		this.state.usersRef.child(`${this.state.user.uid}/colors`).off();
-	};
+		this.state.usersRef.child(`${this.state.user.uid}/colors`).off()
+	}
 
 	addListener = (userId) => {
 		let userColors = [];
