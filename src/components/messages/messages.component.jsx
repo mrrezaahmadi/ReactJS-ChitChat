@@ -9,6 +9,7 @@ import { setUserPosts } from "../../redux/user/user.action";
 import MessagesHeader from "../messages-header/messages-header.component";
 import MessageForm from "../messages-form/messages-form.component";
 import Message from "../message/message.component";
+import IsTyping from "../is-typing/is-typing.component";
 
 import "./messages.styles.scss";
 
@@ -204,6 +205,9 @@ class Messages extends React.Component {
 						{searchTerm
 							? this.displayMessages(searchResults)
 							: this.displayMessages(messages)}
+						<div style={{ display: "flex", alignItems: "center" }}>
+							<span className="user__typing">Reza is typing</span> <IsTyping />
+						</div>
 					</Comment.Group>
 				</Segment>
 
