@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import "./is-typing.styles.scss";
 
 export class IsTyping extends Component {
 	render() {

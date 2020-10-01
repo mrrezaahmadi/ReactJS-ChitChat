@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import "./color-panel.styles.scss";
 import {
 	Sidebar,
 	Menu,

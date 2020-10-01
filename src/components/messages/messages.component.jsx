@@ -10,8 +10,9 @@ import MessagesHeader from "../messages-header/messages-header.component";
 import MessageForm from "../messages-form/messages-form.component";
 import Message from "../message/message.component";
 import IsTyping from "../is-typing/is-typing.component";
+import Skeleton from "../messages-skeleton/messages-skeleton.component";
 
-import "./messages.styles.scss";
+// import "./messages.styles.scss";
 
 class Messages extends React.Component {
 	state = {
@@ -186,22 +187,6 @@ class Messages extends React.Component {
 		this.props.setUserPosts(userPosts);
 	};
 
-	displayMessages = (messages) =>
-		messages.length > 0 &&
-		messages.map((message) => (
-			<Message
-				key={message.timestamp}
-				message={message}
-				user={this.state.user}
-			/>
-		));
-
-	displayChannelName = (channel) => {
-		return channel
-			? `${this.state.privateChannel ? "@" : "#"}${channel.name}`
-			: "";
-	};
-
 	handleStar = () => {
 		this.setState(
 			(prevState) => ({
@@ -237,6 +222,22 @@ class Messages extends React.Component {
 		}
 	};
 
+	displayMessages = (messages) =>
+		messages.length > 0 &&
+		messages.map((message) => (
+			<Message
+				key={message.timestamp}
+				message={message}
+				user={this.state.user}
+			/>
+		));
+
+	displayChannelName = (channel) => {
+		return channel
+			? `${this.state.privateChannel ? "@" : "#"}${channel.name}`
+			: "";
+	};
+
 	displayTypingUsers = (users) =>
 		users.length > 0 &&
 		users.map((user) => (
@@ -248,9 +249,28 @@ class Messages extends React.Component {
 			</div>
 		));
 
+	displayMessagesSkeleton = (loading) =>
+		loading ? (
+			<React.Fragment>
+				{[...Array(15)].map((_, i) => <Skeleton key={i} />)}
+			</React.Fragment>
+		) : null;
+
 	render() {
-		// prettier-ignore
-		const { messagesRef, messages, channel, user, numUniqueUsers, searchTerm, searchResults, searchLoading, privateChannel, isChannelStarred, typingUsers } = this.state;
+		const {
+			messagesLoading,
+			messagesRef,
+			messages,
+			channel,
+			user,
+			numUniqueUsers,
+			searchTerm,
+			searchResults,
+			searchLoading,
+			privateChannel,
+			isChannelStarred,
+			typingUsers,
+		} = this.state;
 
 		return (
 			<React.Fragment>
@@ -266,6 +286,7 @@ class Messages extends React.Component {
 
 				<Segment>
 					<Comment.Group className="messages">
+						{this.displayMessagesSkeleton(messagesLoading)}
 						{searchTerm
 							? this.displayMessages(searchResults)
 							: this.displayMessages(messages)}
