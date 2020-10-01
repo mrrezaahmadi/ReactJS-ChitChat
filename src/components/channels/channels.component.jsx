@@ -52,6 +52,13 @@ class Channels extends React.Component {
 		});
 	};
 
+	removeListeners = () => {
+		this.state.channelsRef.off();
+		this.state.channels.forEach((channel) => {
+			this.state.messagesRef.child(channel.id).off();
+		});
+	};
+
 	addNotificationListener = (channelId) => {
 		this.state.messagesRef.child(channelId).on("value", (snap) => {
 			if (this.state.channel) {
@@ -92,10 +99,6 @@ class Channels extends React.Component {
 		}
 
 		this.setState({ notifications });
-	};
-
-	removeListeners = () => {
-		this.state.channelsRef.off();
 	};
 
 	setFirstChannel = () => {
