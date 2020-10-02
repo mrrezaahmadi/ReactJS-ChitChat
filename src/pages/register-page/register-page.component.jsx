@@ -113,7 +113,7 @@ const Register = () => {
 			<Grid.Column style={{ maxWidth: 450 }}>
 				<Header as="h2" icon color="orange" textAlign="center">
 					<Icon name="puzzle piece" color="red" />
-					Register for slack
+					Register for Chit Chat
 				</Header>
 				<Form size="large" onSubmit={handleSubmit}>
 					<Segment stacked>

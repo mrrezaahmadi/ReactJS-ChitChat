@@ -26,7 +26,7 @@ function App({ setUser, isLoading, clearUser }) {
         setUser(user)
         history.push('/')
       } else {
-        history.push('/login')
+        history.push('/register')
         clearUser()
       }
     })
@@ -35,8 +35,8 @@ function App({ setUser, isLoading, clearUser }) {
   return isLoading ? <Spinner /> : (
     <Switch>
       <Route exact path='/' component={Home} />
-      <Route path="/login" component={Login} />
       <Route path='/register' component={Register} />
+      <Route path="/login" component={Login} />
     </Switch>
   )
 

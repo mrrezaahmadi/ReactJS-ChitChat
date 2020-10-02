@@ -1,6 +1,7 @@
 import React from "react";
 import firebase from "../../firebase/firebase.config";
 import AvatarEditor from "react-avatar-editor";
+import ChitChatLogo from "../../assets/images/chit-chat.svg";
 
 // Styles
 import {
@@ -55,10 +56,8 @@ class UserPanel extends React.Component {
 	];
 
 	handleSignout = () => {
-		firebase
-			.auth()
-			.signOut()
-			// .then(() => console.log("signed out!"));
+		firebase.auth().signOut();
+		// .then(() => console.log("signed out!"));
 	};
 
 	handleChange = (e) => {
@@ -133,8 +132,8 @@ class UserPanel extends React.Component {
 					<Grid.Row style={{ padding: "1.2em", margin: 0 }}>
 						{/* App Header */}
 						<Header inverted floated="left" as="h2">
-							<Icon name="code" />
-							<Header.Content>DevChat</Header.Content>
+							<Image src={ChitChatLogo} size="medium" />
+							<Header.Content>Chit Chat</Header.Content>
 						</Header>
 
 						{/* User Dropdown  */}

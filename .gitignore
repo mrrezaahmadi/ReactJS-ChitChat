@@ -2,6 +2,10 @@
 
 # Firebase
 /src/firebase
+/.firebase
+.firebaserc
+database.rules.json
+storage.rules
 
 # dependencies
 /node_modules

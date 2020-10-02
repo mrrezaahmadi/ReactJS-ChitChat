@@ -53,7 +53,7 @@ const Login = () => {
 			<Grid.Column style={{ maxWidth: 450 }}>
 				<Header as="h2" icon color="violet" textAlign="center">
 					<Icon name="code branch" color="violet" />
-					Login to DevChat
+					Login to Chit Chat
 				</Header>
 				<Form size="large" onSubmit={handleSubmit}>
 					<Segment stacked>
